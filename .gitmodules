@@ -1,0 +1,6 @@
+[submodule "singletons"]
+	path = singletons
+	url = https://github.com/goldfirere/singletons
+[submodule "singleton-nats"]
+	path = singleton-nats
+	url = https://github.com/AndrasKovacs/singleton-nats
