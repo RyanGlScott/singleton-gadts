@@ -162,19 +162,20 @@ singletons' genSings qdecs = do
 -----
 
 -- | Generate 'Demote', 'Promote', 'SingKind', 'DemoteX', 'PromoteX', and
--- 'SingKindC' instances for each provided data type.
+-- 'SingKindC' instances for each provided data type. Ignores non–data type
+-- declarations.
 genSingKindInsts :: DsMonad q => [Name] -> q [Dec]
 genSingKindInsts names = do
   (decs1, decs2) <- genSingKindInsts' names
   pure $ decs1 ++ decs2
 
 -- | Like 'genSingKindInsts', but only generates 'Demote', 'Promote', and
--- 'SingKind' instances.
+-- 'SingKind' instances. Ignores non–data type declarations.
 genSingKindInsts1 :: DsMonad q => [Name] -> q [Dec]
 genSingKindInsts1 = fmap fst . genSingKindInsts'
 
 -- | Like 'genSingKindInsts', but only generates 'DemoteX', 'PromoteX', and
--- 'SingKindC' instances.
+-- 'SingKindC' instances. Ignores non–data type declarations.
 genSingKindInsts2 :: DsMonad q => [Name] -> q [Dec]
 genSingKindInsts2 = fmap snd . genSingKindInsts'
 
@@ -195,13 +196,13 @@ singDecs decs = do
 
 singInfo :: DsMonad q => DInfo -> q ([DDec], [DDec])
 singInfo (DTyConI dec _) = singDec dec
-singInfo _               = fail "Non-data type info provided"
+singInfo _               = pure ([], [])
 
 singDec :: DsMonad q => DDec -> q ([DDec], [DDec])
 singDec (DDataD _nd _cxt name tvbs mk cons _derivings)
   = do all_tvbs <- buildDataDTvbs tvbs mk
        singDataD name all_tvbs cons
-singDec _ = fail "Non-data type dec provided"
+singDec _ = pure ([], [])
 
 -- Generates all SingKind-related declarations for a given data type,
 -- separating the declarations into two groups (as described above) to
