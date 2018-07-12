@@ -20,7 +20,8 @@ cannot be given instances of the @SingKind@ variant offered by the @singletons@
 library.
 -}
 module Data.Singletons.GADT.Prelude (
-    type (%:~:), type (%:~~:)
+    Sing(..)
+  , type (%:~:), type (%:~~:)
 
     -- * Defunctionalization symbols
   , ReflSym0, HReflSym0
