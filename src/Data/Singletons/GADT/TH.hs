@@ -25,6 +25,9 @@ module Data.Singletons.GADT.TH (
   , genSingKindInsts
   , genSingKindInsts1
   , genSingKindInsts2
+
+    -- * The rest of "Data.Singletons.TH"
+  , module Data.Singletons.TH
   ) where
 
 import           Control.Monad
@@ -35,6 +38,9 @@ import qualified Data.Singletons as Old (SingKind)
 import           Data.Singletons.GADT
 import           Data.Singletons.Prelude (Sing(..))
 import qualified Data.Singletons.TH as TH
+import           Data.Singletons.TH hiding
+                   ( genSingletons, singletons, singletonsOnly
+                   , SingKind(..), FromSing, demote, singThat, withSomeSing )
 import           Language.Haskell.TH.Syntax
 import           Language.Haskell.TH.Desugar
 
