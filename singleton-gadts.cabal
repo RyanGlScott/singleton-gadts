@@ -5,6 +5,17 @@ description:         This package provides a variant of the @SingKind@ class
                      from the @singletons@ library which supports GADTs and
                      poly-kinded data types, as well as Template Haskell
                      functionality to quickly generate instances of it.
+                     .
+                     The design of this library is heavily inspired by
+                     code written
+                     <https://github.com/goldfirere/singletons/issues/150#issuecomment-306539091 here>
+                     by Richard Eisenberg. This technique is presented as a
+                     separate library (instead of incorporating the technique
+                     directly into the @singletons@ library) due to some
+                     annoying steps one must take to work around
+                     <https://ghc.haskell.org/trac/ghc/ticket/12088 GHC Trac #12088>,
+                     which affects the code here.  Refer to the documentation
+                     in the "Data.Singletons.GADT" module for more information.
 homepage:            https://github.com/RyanGlScott/singleton-gadts
 bug-reports:         https://github.com/RyanGlScott/singleton-gadts/issues
 license:             BSD3
