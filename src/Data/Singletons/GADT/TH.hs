@@ -26,6 +26,9 @@ module Data.Singletons.GADT.TH (
   , genSingKindInsts1
   , genSingKindInsts2
 
+    -- * "Data.Singletons.GADT" reexports
+  , module Data.Singletons.GADT
+
     -- * The rest of "Data.Singletons.TH"
   , module Data.Singletons.TH
   ) where
