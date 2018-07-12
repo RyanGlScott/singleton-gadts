@@ -1,9 +1,11 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeInType #-}
@@ -35,12 +37,26 @@ module Data.Singletons.GADT (
   , demote
   , pattern FromSing
 
+    -- * Defunctionalization symbols
+  , DemoteSym0, DemoteSym1
+  , PromoteSym0, PromoteSym1
+  {-
+  , DemoteXSym0, DemoteXSym1
+  , PromoteXSym0, PromoteXSym1
+  -}
+  , PromoteDemoteInverseSym0, PromoteDemoteInverseSym1
+  , SingKindCSym0, SingKindCSym1
+  , SingKindXSym0, SingKindXSym1
+
     -- * The rest of "Data.Singletons"
   , module Data.Singletons
   ) where
 
 import Data.Kind
-import Data.Singletons hiding (SingKind(..), FromSing, demote, singThat, withSomeSing)
+import Data.Singletons hiding
+  ( SingKind(..), DemoteSym0, DemoteSym1, FromSing
+  , demote, singThat, withSomeSing )
+import Data.Singletons.TH (genDefunSymbols)
 import Data.Type.Equality
 import Unsafe.Coerce
 
@@ -268,3 +284,13 @@ instance (SingKindX k1, SingKindX k2) => SingKind (k1 ~> k2) where
         where
           lam :: forall (t :: k1). Sing t -> Sing (f @@ t)
           lam x = withSomeSing (f (fromSing x)) (\(r :: Sing res) -> unsafeCoerce r)
+
+-----
+-- Defunctionalization symbols
+-----
+
+$(genDefunSymbols [ ''Demote , ''Promote
+                  -- Can't do these yet due to https://ghc.haskell.org/trac/ghc/ticket/12564
+                  -- , ''DemoteX, ''PromoteX
+                  , ''PromoteDemoteInverse, ''SingKindC, ''SingKindX
+                  ])

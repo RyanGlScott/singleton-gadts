@@ -38,7 +38,8 @@ import           Data.Proxy (Proxy(..))
 import           Data.Singletons.GADT
 import           Data.Singletons.GADT.Prelude.Internal
 import           Data.Singletons.GADT.TH
-import           Data.Singletons.Prelude hiding (SingKind(..), FromSing, demote, singThat, withSomeSing)
+import           Data.Singletons.Prelude hiding ( SingKind(..), DemoteSym0, DemoteSym1
+                                                , FromSing, demote, singThat, withSomeSing )
 import           Data.Singletons.Prelude.Const (Sing(..))
 import           Data.Singletons.Prelude.Identity (Sing(..))
 import           Data.Singletons.Prelude.List.NonEmpty (Sing(..))

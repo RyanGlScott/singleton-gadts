@@ -43,7 +43,8 @@ import           Data.Singletons.Prelude (Sing(..))
 import qualified Data.Singletons.TH as TH
 import           Data.Singletons.TH hiding
                    ( genSingletons, singletons, singletonsOnly
-                   , SingKind(..), FromSing, demote, singThat, withSomeSing )
+                   , SingKind(..), DemoteSym0, DemoteSym1, FromSing
+                   , demote, singThat, withSomeSing )
 import           Language.Haskell.TH.Syntax
 import           Language.Haskell.TH.Desugar
 
