@@ -1,4 +1,1 @@
 packages: .
-          ./singletons
-          ./singletons/th-desugar
-          ./singleton-nats
