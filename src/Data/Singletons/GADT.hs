@@ -213,7 +213,7 @@ withSomeSing x f =
 -- property.  If the singleton does not satisfy the property, then the function
 -- returns 'Nothing'. The property is expressed in terms of the underlying
 -- representation of the singleton.
-singThat :: forall (a :: k). (SingKind k, SingI a)
+singThat :: forall k (a :: k). (SingKind k, SingI a)
          => (Demote k -> Bool) -> Maybe (Sing a)
 singThat p = withSing $ \x -> if p (fromSing x) then Just x else Nothing
 
