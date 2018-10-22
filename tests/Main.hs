@@ -21,7 +21,7 @@ $(singletons1 [d|
   data Foo :: Type -> Type where
     MkFoo :: Foo Bool
 
-  data Quux (a :: Type) where
+  data Quux :: Type -> Type where
     MkQuux1 :: Quux Bool
     MkQuux2 :: Quux Ordering
 
@@ -29,11 +29,12 @@ $(singletons1 [d|
     FZ :: Fin (S n)
     FS :: Fin n -> Fin (S n)
 
-  data Vec (n :: Nat) (a :: Type) where
+  data Vec :: Nat -> Type -> Type where
     VNil  :: Vec Z a
     VCons :: a -> Vec n a -> Vec (S n) a
 
-  data Prox (a :: k) = P
+  data Prox :: forall k. k -> Type where
+    P :: forall k (a :: k). Prox a
 
   data HList :: [Type] -> Type where
     HNil  :: HList '[]
