@@ -39,7 +39,7 @@ import           Data.Foldable
 import           Data.Maybe
 import qualified Data.Singletons as Old (SingKind)
 import           Data.Singletons.GADT
-import           Data.Singletons.Prelude (Sing(..))
+import           Data.Singletons.Prelude (SList(..))
 import qualified Data.Singletons.TH as TH
 import           Data.Singletons.TH hiding
                    ( genSingletons, singletons, singletonsOnly
@@ -221,9 +221,9 @@ singDataD name tvbs ctors = do
   -- Demote, Promote instances
   let mkPromoteDemoteInstance :: Name -> Name -> DDec
       mkPromoteDemoteInstance cls clsX =
-        DTySynInstD cls $ DTySynEqn [dataType]
-                        $ foldType (DConT name)
-                        $ map (DConT clsX `DAppT`) tvbTys
+        DTySynInstD $ DTySynEqn Nothing (DConT cls `DAppT` dataType)
+                    $ foldType (DConT name)
+                    $ map (DConT clsX `DAppT`) tvbTys
 
       demoteInstance  = mkPromoteDemoteInstance ''Demote  ''DemoteX
       promoteInstance = mkPromoteDemoteInstance ''Promote ''PromoteX
@@ -235,8 +235,8 @@ singDataD name tvbs ctors = do
   emptyToSingClause   <- mkEmptyToSingClause
 
   let singKindInstance =
-        DInstanceD Nothing
-                   (map (DAppPr (DConPr ''SingKindX)) tvbTys)
+        DInstanceD Nothing Nothing
+                   (map (DAppT (DConT ''SingKindX)) tvbTys)
                    (DAppT (DConT ''SingKind) dataType)
                    [ DLetDec $ DFunD 'fromSing
                              $ fromSingClauses `orIfEmpty` [emptyFromSingClause]
@@ -262,9 +262,10 @@ singDataD name tvbs ctors = do
             let (cname, numArgs) = extractNameArgs c
             varNames <- replicateM numArgs (qNewName "x")
             let varTys = map DVarT varNames
-            pure $ DTySynInstD cls $ DTySynEqn [foldType (DConT cname) varTys]
-                                   $ foldArgs (DConT cname)
-                                   $ map (DConT cls `DAppT`) varTys
+            pure $ DTySynInstD
+                 $ DTySynEqn Nothing (DConT cls `DAppT` foldType (DConT cname) varTys)
+                 $ foldArgs (DConT cname)
+                 $ map (DConT cls `DAppT`) varTys
 
   demoteXInstances   <- mkPromoteXDemoteXInstances ''DemoteX
   promoteXInstances  <- mkPromoteXDemoteXInstances ''PromoteX
@@ -278,7 +279,7 @@ singDataD name tvbs ctors = do
     mkFromSingClause c = do
       let (cname, numArgs) = extractNameArgs c
       varNames <- replicateM numArgs (qNewName "b")
-      return $ DClause [DConPa (singDataConName cname) (map DVarPa varNames)]
+      return $ DClause [DConP (singDataConName cname) (map DVarP varNames)]
                        (foldExp
                           (DConE cname)
                           (map (DAppE (DVarE 'fromSing) . DVarE) varNames))
@@ -293,9 +294,9 @@ singDataD name tvbs ctors = do
           varPats        = zipWith mkToSingVarPat varNames promoted
           recursiveCalls = zipWith mkRecursiveCall varNames promoted
       return $
-        DClause [DConPa cname varPats]
+        DClause [DConP cname varPats]
                 (multiCase recursiveCalls
-                           (map (DConPa 'SomeSing . pure . DVarPa)
+                           (map (DConP 'SomeSing . pure . DVarP)
                                 svarNames)
                            (DAppE (DConE 'SomeSing)
                                      (foldExp (DConE (singDataConName cname))
@@ -303,8 +304,8 @@ singDataD name tvbs ctors = do
 
     mkToSingVarPat :: Name -> DKind -> DPat
     mkToSingVarPat varName _ki =
-      -- DSigPa (DVarPa varName) (DAppT (DConT ''Demote) ki)
-      DVarPa varName
+      -- DSigP (DVarP varName) (DAppT (DConT ''Demote) ki)
+      DVarP varName
 
     mkRecursiveCall :: Name -> DKind -> DExp
     mkRecursiveCall var_name _ki =
@@ -317,13 +318,13 @@ singDataD name tvbs ctors = do
     mkEmptyFromSingClause :: q DClause
     mkEmptyFromSingClause = do
       x <- qNewName "x"
-      pure $ DClause [DVarPa x]
+      pure $ DClause [DVarP x]
            $ DCaseE (DVarE x) []
 
     mkEmptyToSingClause :: q DClause
     mkEmptyToSingClause = do
       x <- qNewName "x"
-      pure $ DClause [DVarPa x]
+      pure $ DClause [DVarP x]
            $ DConE 'SomeSing `DAppE` DCaseE (DVarE x) []
 
 -- Discard any type class instances for SingKind (from the singletons library).

@@ -20,8 +20,7 @@ cannot be given instances of the @SingKind@ variant offered by the @singletons@
 library.
 -}
 module Data.Singletons.GADT.Prelude (
-    Sing(..)
-  , type (%:~:), type (%:~~:)
+    type (%:~:)(..), type (%:~~:)(..)
 
     -- * Defunctionalization symbols
   , ReflSym0, HReflSym0
@@ -34,22 +33,21 @@ module Data.Singletons.GADT.Prelude (
   ) where
 
 import           Data.Nat
-import           Data.Proxy (Proxy(..))
 import           Data.Singletons.GADT
 import           Data.Singletons.GADT.Prelude.Internal
 import           Data.Singletons.GADT.TH
 import           Data.Singletons.Prelude hiding ( SingKind(..), DemoteSym0, DemoteSym1
                                                 , FromSing, demote, singThat, withSomeSing )
-import           Data.Singletons.Prelude.Const (Sing(..))
-import           Data.Singletons.Prelude.Identity (Sing(..))
-import           Data.Singletons.Prelude.List.NonEmpty (Sing(..))
-import           Data.Singletons.Prelude.Monoid hiding (Sing(SFirst, SLast, sGetFirst, sGetLast))
-import           Data.Singletons.Prelude.Semigroup hiding (Sing(SFirst, SLast, sGetFirst, sGetLast))
-import           Data.Singletons.TypeLits (Sing(..))
+import           Data.Singletons.Prelude.Const (SConst(..))
+import           Data.Singletons.Prelude.Identity (SIdentity(..))
+import           Data.Singletons.Prelude.List.NonEmpty (SNonEmpty(..))
+import           Data.Singletons.Prelude.Monoid hiding (SFirst(..), SLast(..))
+import           Data.Singletons.Prelude.Semigroup hiding (SFirst(..), SLast(..))
+import           Data.Singletons.TypeLits (SNat(..), SSymbol(..))
 import qualified Data.Text as T
 import           Data.Text (Text)
 
-import           GHC.TypeLits (SomeSymbol(..), Symbol, someSymbolVal, symbolVal)
+import           GHC.TypeLits (SomeSymbol(..), someSymbolVal, symbolVal)
 import qualified GHC.TypeNats as TN
 import           GHC.TypeNats (SomeNat(..))
 
