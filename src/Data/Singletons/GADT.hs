@@ -5,6 +5,7 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -75,7 +76,8 @@ import Unsafe.Coerce
 -- * @'Promote' (a -> b) = 'Promote' a '~>' 'Promote' b@
 -- * @'Promote' Natural = Nat@
 -- * @'Promote' Text = Symbol@
-type family Promote (k :: Type) :: Type
+type Promote :: Type -> Type
+type family Promote k
 -- | A generalized form of 'Promote' which can work over types of any kind.
 -- @'PromoteX' (a :: k)@ is @'Promote' a@ when @k@ is @Type@.
 -- For some non-@Type@ examples:
@@ -83,7 +85,8 @@ type family Promote (k :: Type) :: Type
 -- * @'PromoteX' 'True' = 'True'@
 -- * @'PromoteX' ('Just' x) = 'Just' ('PromoteX' x)@
 -- * @'PromoteX' ((:) a) = 'TyCon1' ((:) ('PromoteX' a))@
-type family PromoteX (a :: k) :: Promote k
+type PromoteX :: k -> Promote k
+type family PromoteX a
 
 -- | Get a base type from the promoted kind. For example:
 --
@@ -96,7 +99,8 @@ type family PromoteX (a :: k) :: Promote k
 -- * @'Demote' (a '~>' b) = 'Demote' a -> 'Demote' b@
 -- * @'Demote' Nat = Natural@
 -- * @'Demote' Symbol = Text@
-type family Demote (k :: Type) :: Type
+type Demote :: Type -> Type
+type family Demote k
 -- | A generalized form of 'Demote' which can work over types of any kind.
 -- @'DemoteX' (a :: k)@ is @'Demote' a@ when @k@ is @Type@.
 -- For some non-@Type@ examples:
@@ -104,24 +108,28 @@ type family Demote (k :: Type) :: Type
 -- * @'DemoteX' 'True' = 'True'@
 -- * @'DemoteX' ('Just' x) = 'Just' ('DemoteX' x)@
 -- * @'DemoteX' ('TyCon1' ((:) a)) = (:) ('DemoteX' a)@
-type family DemoteX (a :: k) :: Demote k
+type DemoteX :: k -> Demote k
+type family DemoteX a
 
 -- | A proposition which states that 'PromoteX' and 'DemoteX' are inverses.
 -- This is a particularly valuable hint for type inference in typical
 -- 'SingKind' instances for GADTs.
-type PromoteDemoteInverse (a :: k) = (PromoteX (DemoteX a) ~~ a)
+type PromoteDemoteInverse :: k -> Constraint
+type PromoteDemoteInverse a = (PromoteX (DemoteX a) ~~ a)
 
 -- | @'SingKindC' a@ is @'SingKind' a@ when @a@ is a 'Type'. If @a@ is not
 -- a 'Type', then @'SingKindC' a@ recurs into @a@, gathering up 'SingKind'
 -- constraints when necessary. (For instance,
 -- @'SingKindC' (x:xs) = ('SingKindC' x, 'SingKindC' xs)@.)
-type family SingKindC (a :: k) :: Constraint
+type SingKindC :: k -> Constraint
+type family SingKindC a
 -- | A combination of 'SingKindC' and 'PromoteDemoteInverse'. Typically, a
 -- 'SingKind' instance will have a 'SingKindX' constraint on each of the
 -- type parameters to the data type receiving and instance.
 -- (For example,
 -- @instance ('SingKindX' a_1, ..., 'SingKindX' a_n) => 'SingKind' (D a_1 ... a_n)@.)
-type SingKindX (a :: k) = (SingKindC a, PromoteDemoteInverse a)
+type SingKindX :: k -> Constraint
+type SingKindX a = (SingKindC a, PromoteDemoteInverse a)
 
 -- | The 'SingKind' class is a /kind/ class. It classifies all kinds
 -- for which singletons are defined. The class supports converting between a singleton
@@ -140,6 +148,7 @@ type SingKindX (a :: k) = (SingKindC a, PromoteDemoteInverse a)
 -- @
 -- (\\('FromSing' sing) -> 'FromSing' sing) ≡ 'id'
 -- @
+type SingKind :: Type -> Constraint
 class PromoteDemoteInverse k => SingKind k where
   -- | Convert a singleton to its unrefined version.
   fromSing :: Sing (a :: k) -> Demote k
@@ -290,7 +299,7 @@ instance (SingKindX k1, SingKindX k2) => SingKind (k1 ~> k2) where
 -----
 
 $(genDefunSymbols [ ''Demote , ''Promote
-                  -- Can't do these yet due to https://ghc.haskell.org/trac/ghc/ticket/12564
+                  -- Can't do these yet due to https://gitlab.haskell.org/ghc/ghc/issues/12564
                   -- , ''DemoteX, ''PromoteX
                   , ''PromoteDemoteInverse, ''SingKindC, ''SingKindX
                   ])

@@ -39,8 +39,8 @@ import           Data.Foldable
 import           Data.Maybe
 import qualified Data.Singletons as Old (SingKind)
 import           Data.Singletons.GADT
-import           Data.Singletons.Prelude (SList(..))
 import qualified Data.Singletons.TH as TH
+import           Data.Singletons.TH.Options hiding (genSingKindInsts)
 import           Data.Singletons.TH hiding
                    ( genSingletons, singletons, singletonsOnly
                    , SingKind(..), DemoteSym0, DemoteSym1, FromSing
@@ -107,17 +107,17 @@ day, but chances are, it won't be very useful to you.
 -- > $(genSingletons [''Bool, ''Maybe, ''Either, ''[]])
 --
 -- to generate singletons for Prelude types.
-genSingletons :: DsMonad q => [Name] -> q [Dec]
+genSingletons :: OptionsMonad q => [Name] -> q [Dec]
 genSingletons names = do
   (decs1, decs2) <- genSingletons' names
   pure $ decs1 ++ decs2
 
 -- | Like 'genSingletons', but only generates 'Demote', 'Promote', and
 -- 'SingKind' instances.
-genSingletons1 :: DsMonad q => [Name] -> q [Dec]
+genSingletons1 :: OptionsMonad q => [Name] -> q [Dec]
 genSingletons1 = fmap fst . genSingletons'
 
-genSingletons' :: DsMonad q => [Name] -> q ([Dec], [Dec])
+genSingletons' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
 genSingletons' names = do
   oldDecs <- filterOutOldSingKind <$> TH.genSingletons names
   (newDecs1, newDecs2) <- genSingKindInsts' names
@@ -127,31 +127,31 @@ genSingletons' names = do
 -- the original declarations.
 -- See <https://github.com/goldfirere/singletons/blob/master/README.md> for
 -- further explanation.
-singletons :: DsMonad q => q [Dec] -> q [Dec]
+singletons :: OptionsMonad q => q [Dec] -> q [Dec]
 singletons qdecs = do
   (decs1, decs2) <- singletons' TH.singletons qdecs
   pure $ decs1 ++ decs2
 
 -- | Like 'singletons', but only generates 'Demote', 'Promote', and
 -- 'SingKind' instances.
-singletons1 :: DsMonad q => q [Dec] -> q [Dec]
+singletons1 :: OptionsMonad q => q [Dec] -> q [Dec]
 singletons1 = fmap fst . singletons' TH.singletons
 
 -- | Make promoted and singleton versions of all declarations given, discarding
 -- the original declarations. Note that a singleton based on a datatype needs
 -- the original datatype, so this will fail if it sees any datatype declarations.
 -- Classes, instances, and functions are all fine.
-singletonsOnly :: DsMonad q => q [Dec] -> q [Dec]
+singletonsOnly :: OptionsMonad q => q [Dec] -> q [Dec]
 singletonsOnly qdecs = do
   (decs1, decs2) <- singletons' TH.singletonsOnly qdecs
   pure $ decs1 ++ decs2
 
 -- | Like 'singletonsOnly', but only generates 'Demote', 'Promote', and
 -- 'SingKind' instances.
-singletonsOnly1 :: DsMonad q => q [Dec] -> q [Dec]
+singletonsOnly1 :: OptionsMonad q => q [Dec] -> q [Dec]
 singletonsOnly1 = fmap fst . singletons' TH.singletonsOnly
 
-singletons' :: DsMonad q => (q [Dec] -> q [Dec]) -> q [Dec] -> q ([Dec], [Dec])
+singletons' :: OptionsMonad q => (q [Dec] -> q [Dec]) -> q [Dec] -> q ([Dec], [Dec])
 singletons' genSings qdecs = do
   decs <- qdecs
   oldDecs <- filterOutOldSingKind <$> genSings (pure decs)
@@ -165,22 +165,22 @@ singletons' genSings qdecs = do
 -- | Generate 'Demote', 'Promote', 'SingKind', 'DemoteX', 'PromoteX', and
 -- 'SingKindC' instances for each provided data type. Ignores non–data type
 -- declarations.
-genSingKindInsts :: DsMonad q => [Name] -> q [Dec]
+genSingKindInsts :: OptionsMonad q => [Name] -> q [Dec]
 genSingKindInsts names = do
   (decs1, decs2) <- genSingKindInsts' names
   pure $ decs1 ++ decs2
 
 -- | Like 'genSingKindInsts', but only generates 'Demote', 'Promote', and
 -- 'SingKind' instances. Ignores non–data type declarations.
-genSingKindInsts1 :: DsMonad q => [Name] -> q [Dec]
+genSingKindInsts1 :: OptionsMonad q => [Name] -> q [Dec]
 genSingKindInsts1 = fmap fst . genSingKindInsts'
 
 -- | Like 'genSingKindInsts', but only generates 'DemoteX', 'PromoteX', and
 -- 'SingKindC' instances. Ignores non–data type declarations.
-genSingKindInsts2 :: DsMonad q => [Name] -> q [Dec]
+genSingKindInsts2 :: OptionsMonad q => [Name] -> q [Dec]
 genSingKindInsts2 = fmap snd . genSingKindInsts'
 
-genSingKindInsts' :: DsMonad q => [Name] -> q ([Dec], [Dec])
+genSingKindInsts' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
 genSingKindInsts' names = do
   (decs1, decs2) <- concatMapM (singInfo <=< dsInfo <=< reifyWithLocals) names
   pure (decsToTH decs1, decsToTH decs2)
@@ -189,17 +189,17 @@ genSingKindInsts' names = do
 -- Internals
 -----
 
-singDecs :: DsMonad q => [Dec] -> q ([DDec], [DDec])
+singDecs :: OptionsMonad q => [Dec] -> q ([DDec], [DDec])
 singDecs decs = do
   ddecs <- withLocalDeclarations decs $ dsDecs decs
   (ddecss1, ddecss2) <- mapAndUnzipM singDec ddecs
   pure (concat ddecss1, concat ddecss2)
 
-singInfo :: DsMonad q => DInfo -> q ([DDec], [DDec])
+singInfo :: OptionsMonad q => DInfo -> q ([DDec], [DDec])
 singInfo (DTyConI dec _) = singDec dec
 singInfo _               = pure ([], [])
 
-singDec :: DsMonad q => DDec -> q ([DDec], [DDec])
+singDec :: OptionsMonad q => DDec -> q ([DDec], [DDec])
 singDec (DDataD _nd _cxt name tvbs mk cons _derivings)
   = do all_tvbs <- buildDataDTvbs tvbs mk
        singDataD name all_tvbs cons
@@ -210,7 +210,7 @@ singDec _ = pure ([], [])
 -- avoid Template Haskell staging restrictions.
 --
 -- This is largely cargo-culted from singDataD in the singletons library.
-singDataD :: forall q. DsMonad q
+singDataD :: forall q. OptionsMonad q
           => Name -> [DTyVarBndr] -> [DCon]
           -> q ([DDec], [DDec])
 singDataD name tvbs ctors = do
@@ -277,15 +277,17 @@ singDataD name tvbs ctors = do
   where
     mkFromSingClause :: DCon -> q DClause
     mkFromSingClause c = do
+      opts <- getOptions
       let (cname, numArgs) = extractNameArgs c
       varNames <- replicateM numArgs (qNewName "b")
-      return $ DClause [DConP (singDataConName cname) (map DVarP varNames)]
+      return $ DClause [DConP (singledDataConName opts cname) (map DVarP varNames)]
                        (foldExp
                           (DConE cname)
                           (map (DAppE (DVarE 'fromSing) . DVarE) varNames))
 
     mkToSingClause :: DCon -> q DClause
     mkToSingClause (DCon _tvbs _cxt cname fields _rty) = do
+      opts <- getOptions
       let types = tysOfConFields fields
       varNames  <- mapM (const $ qNewName "b") types
       svarNames <- mapM (const $ qNewName "c") types
@@ -299,7 +301,7 @@ singDataD name tvbs ctors = do
                            (map (DConP 'SomeSing . pure . DVarP)
                                 svarNames)
                            (DAppE (DConE 'SomeSing)
-                                     (foldExp (DConE (singDataConName cname))
+                                     (foldExp (DConE (singledDataConName opts cname))
                                               (map DVarE svarNames))))
 
     mkToSingVarPat :: Name -> DKind -> DPat
@@ -343,29 +345,9 @@ mkTupleDType :: [DType] -> DType
 mkTupleDType [ty] = ty
 mkTupleDType tys  = foldl DAppT (DConT $ tupleTypeName (length tys)) tys
 
--- Taken from singletons' source code
-
-singDataConName :: Name -> Name
-singDataConName nm
-  | nm == '[]                                      = 'SNil
-  | nm == '(:)                                     = 'SCons
-  | Just degree <- tupleNameDegree_maybe nm        = mkTupleDataName degree
-  | Just degree <- unboxedTupleNameDegree_maybe nm = mkTupleDataName degree
-  | otherwise                                      = prefixConName "S" "%" nm
-
-mkTupleDataName :: Int -> Name
-mkTupleDataName n = mkName $ "STuple" ++ (show n)
-
--- Put an uppercase prefix on a constructor name. Takes two prefixes:
--- one for identifiers and one for symbols.
---
--- This is different from 'prefixName' in that infix constructor names always
--- start with a colon, so we must insert the prefix after the colon in order
--- for the new name to be syntactically valid.
-prefixConName :: String -> String -> Name -> Name
-prefixConName pre tyPre n = case (nameBase n) of
-    (':' : rest) -> mkName (':' : tyPre ++ rest)
-    alpha -> mkName (pre ++ alpha)
+----------------------------------------
+-- Taken from singletons' source code --
+----------------------------------------
 
 -- build a pattern match over several expressions, each with only one pattern
 multiCase :: [DExp] -> [DPat] -> DExp -> DExp
