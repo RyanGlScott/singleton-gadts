@@ -42,4 +42,4 @@ $(singletons1 [d|
     HNil  :: HList '[]
     HCons :: x -> HList xs -> HList (x:xs)
   |])
-$(genSingKindInsts2 [''Foo, ''Quux, ''Fin, ''Vec, ''Prox, ''HList])
+$(singKindInstances2 [''Foo, ''Quux, ''Fin, ''Vec, ''Prox, ''HList])

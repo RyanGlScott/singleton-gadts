@@ -54,8 +54,8 @@ import           GHC.TypeNats (SomeNat(..))
 
 import           Numeric.Natural (Natural)
 
-$(genSingKindInsts1 existingSingInstNames)
-$(genSingKindInsts2 existingSingInstNames)
+$(singKindInstances1 existingSingInstNames)
+$(singKindInstances2 existingSingInstNames)
 
 type instance Demote TN.Nat = Natural
 type instance Promote Natural = TN.Nat
@@ -74,5 +74,5 @@ instance SingKind Symbol where
                SomeSymbol (_ :: Proxy n) -> SomeSing (SSym :: Sing n)
 
 -- Time to show off
-$(genSingletons1    newSingInstNames)
-$(genSingKindInsts2 newSingInstNames)
+$(genSingletons1     newSingInstNames)
+$(singKindInstances2 newSingInstNames)

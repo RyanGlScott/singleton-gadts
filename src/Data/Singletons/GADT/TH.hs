@@ -22,9 +22,9 @@ module Data.Singletons.GADT.TH (
   , singletonsOnly1
 
     -- * Generating instances of classes/families in "Data.Singletons.GADT"
-  , genSingKindInsts
-  , genSingKindInsts1
-  , genSingKindInsts2
+  , singKindInstances
+  , singKindInstances1
+  , singKindInstances2
 
     -- * "Data.Singletons.GADT" reexports
   , module Data.Singletons.GADT
@@ -40,7 +40,7 @@ import           Data.Maybe
 import           Data.Singletons.GADT
 import           Data.Singletons.GADT.Internal
 import qualified Data.Singletons.TH as TH
-import           Data.Singletons.TH.Options hiding (genSingKindInsts)
+import           Data.Singletons.TH.Options
 import           Data.Singletons.TH hiding
                    ( genSingletons, singletons, singletonsOnly
                    , SingKind(..), DemoteSym0, DemoteSym1, FromSing
@@ -120,7 +120,7 @@ genSingletons1 = fmap fst . genSingletons'
 genSingletons' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
 genSingletons' names = do
   oldDecs <- withOptions noOldSingKindOptions $ TH.genSingletons names
-  (newDecs1, newDecs2) <- genSingKindInsts' names
+  (newDecs1, newDecs2) <- singKindInstances' names
   pure (oldDecs ++ newDecs1, newDecs2)
 
 -- | Make promoted and singleton versions of all declarations given, retaining
@@ -165,23 +165,23 @@ singletons' genSings qdecs = do
 -- | Generate 'Demote', 'Promote', 'SingKind', 'DemoteX', 'PromoteX', and
 -- 'SingKindC' instances for each provided data type. Ignores non–data type
 -- declarations.
-genSingKindInsts :: OptionsMonad q => [Name] -> q [Dec]
-genSingKindInsts names = do
-  (decs1, decs2) <- genSingKindInsts' names
+singKindInstances :: OptionsMonad q => [Name] -> q [Dec]
+singKindInstances names = do
+  (decs1, decs2) <- singKindInstances' names
   pure $ decs1 ++ decs2
 
--- | Like 'genSingKindInsts', but only generates 'Demote', 'Promote', and
+-- | Like 'singKindInstances', but only generates 'Demote', 'Promote', and
 -- 'SingKind' instances. Ignores non–data type declarations.
-genSingKindInsts1 :: OptionsMonad q => [Name] -> q [Dec]
-genSingKindInsts1 = fmap fst . genSingKindInsts'
+singKindInstances1 :: OptionsMonad q => [Name] -> q [Dec]
+singKindInstances1 = fmap fst . singKindInstances'
 
--- | Like 'genSingKindInsts', but only generates 'DemoteX', 'PromoteX', and
+-- | Like 'singKindInstances', but only generates 'DemoteX', 'PromoteX', and
 -- 'SingKindC' instances. Ignores non–data type declarations.
-genSingKindInsts2 :: OptionsMonad q => [Name] -> q [Dec]
-genSingKindInsts2 = fmap snd . genSingKindInsts'
+singKindInstances2 :: OptionsMonad q => [Name] -> q [Dec]
+singKindInstances2 = fmap snd . singKindInstances'
 
-genSingKindInsts' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
-genSingKindInsts' names = do
+singKindInstances' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
+singKindInstances' names = do
   (decs1, decs2) <- concatMapM (singInfo <=< dsInfo <=< reifyWithLocals) names
   pure (decsToTH decs1, decsToTH decs2)
 
