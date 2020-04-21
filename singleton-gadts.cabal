@@ -38,7 +38,7 @@ library
   exposed-modules:     Data.Singletons.GADT
                        Data.Singletons.GADT.Prelude
                        Data.Singletons.GADT.TH
-  other-modules:       Data.Singletons.GADT.Prelude.Internal
+  other-modules:       Data.Singletons.GADT.Internal
   build-depends:       base             >= 4.14  && < 4.15
                      , singletons       >= 2.7   && < 2.8
                      , singleton-nats   >= 0.4.2 && < 0.5

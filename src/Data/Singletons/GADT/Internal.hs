@@ -1,18 +1,19 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-|
-Module:      Data.Singletons.GADT.Prelude.Internal
+Module:      Data.Singletons.GADT.Internal
 Copyright:   (C) 2018 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Defines some lists of 'Name's in their own module to avoid Template
-Haskell staging restrictions.
+Defines various things in their own module to avoid Template Haskell staging
+restrictions.
 -}
-module Data.Singletons.GADT.Prelude.Internal (
+module Data.Singletons.GADT.Internal (
     existingSingInstNames
   , newSingInstNames
+  , noOldSingKindOptions
   ) where
 
 import           Data.Functor.Const (Const)
@@ -23,6 +24,7 @@ import           Data.Monoid hiding (First, Last)
 import           Data.Nat (Nat)
 -- import qualified Data.Semigroup as Semigroup
 import           Data.Semigroup hiding (First, Last)
+import           Data.Singletons.TH.Options
 import           Data.Type.Equality
 import           Data.Void
 
@@ -71,3 +73,7 @@ existingSingInstNames = [ ''Maybe
 -- @singletons@ library (or otherwise).
 newSingInstNames :: [Name]
 newSingInstNames = [''(:~:), ''(:~~:)]
+
+-- | 'Options' that do not generate instances of the old 'SingKind' class.
+noOldSingKindOptions :: Options
+noOldSingKindOptions = defaultOptions{genSingKindInsts = False}

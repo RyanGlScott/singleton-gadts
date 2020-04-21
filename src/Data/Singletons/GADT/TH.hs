@@ -37,8 +37,8 @@ import           Control.Monad
 
 import           Data.Foldable
 import           Data.Maybe
-import qualified Data.Singletons as Old (SingKind)
 import           Data.Singletons.GADT
+import           Data.Singletons.GADT.Internal
 import qualified Data.Singletons.TH as TH
 import           Data.Singletons.TH.Options hiding (genSingKindInsts)
 import           Data.Singletons.TH hiding
@@ -119,7 +119,7 @@ genSingletons1 = fmap fst . genSingletons'
 
 genSingletons' :: OptionsMonad q => [Name] -> q ([Dec], [Dec])
 genSingletons' names = do
-  oldDecs <- filterOutOldSingKind <$> TH.genSingletons names
+  oldDecs <- withOptions noOldSingKindOptions $ TH.genSingletons names
   (newDecs1, newDecs2) <- genSingKindInsts' names
   pure (oldDecs ++ newDecs1, newDecs2)
 
@@ -151,10 +151,10 @@ singletonsOnly qdecs = do
 singletonsOnly1 :: OptionsMonad q => q [Dec] -> q [Dec]
 singletonsOnly1 = fmap fst . singletons' TH.singletonsOnly
 
-singletons' :: OptionsMonad q => (q [Dec] -> q [Dec]) -> q [Dec] -> q ([Dec], [Dec])
+singletons' :: OptionsMonad q => (OptionsM q [Dec] -> OptionsM q [Dec]) -> q [Dec] -> q ([Dec], [Dec])
 singletons' genSings qdecs = do
   decs <- qdecs
-  oldDecs <- filterOutOldSingKind <$> genSings (pure decs)
+  oldDecs <- withOptions noOldSingKindOptions $ genSings (pure decs)
   (newDecs1, newDecs2) <- singDecs decs
   pure (oldDecs ++ decsToTH newDecs1, decsToTH newDecs2)
 
@@ -328,17 +328,6 @@ singDataD name tvbs ctors = do
       x <- qNewName "x"
       pure $ DClause [DVarP x]
            $ DConE 'SomeSing `DAppE` DCaseE (DVarE x) []
-
--- Discard any type class instances for SingKind (from the singletons library).
-filterOutOldSingKind :: [Dec] -> [Dec]
-filterOutOldSingKind = filter (not . isSingKind)
-  where
-    -- If it's stupid but it works, then it ain't stupid.
-    isSingKind :: Dec -> Bool
-    isSingKind (InstanceD _ _ instTy _)
-      | AppT (ConT n) _ <- instTy
-      = n == ''Old.SingKind
-    isSingKind _ = False
 
 -- | Make a constraint tuple 'DType' from a list of 'DType's. Avoids using a 1-tuple.
 mkTupleDType :: [DType] -> DType

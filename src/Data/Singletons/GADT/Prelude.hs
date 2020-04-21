@@ -35,7 +35,7 @@ module Data.Singletons.GADT.Prelude (
 
 import           Data.Nat
 import           Data.Singletons.GADT
-import           Data.Singletons.GADT.Prelude.Internal
+import           Data.Singletons.GADT.Internal
 import           Data.Singletons.GADT.TH
 import           Data.Singletons.Prelude hiding ( SingKind(..), DemoteSym0, DemoteSym1
                                                 , FromSing, demote, singThat, withSomeSing )
