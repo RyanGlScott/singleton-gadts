@@ -29,30 +29,31 @@ module Data.Singletons.GADT.Prelude (
     -- * The rest of "Data.Singletons.GADT"
   , module Data.Singletons.GADT
 
-    -- * The rest of "Data.Singletons.Prelude"
-  , module Data.Singletons.Prelude
+    -- * The rest of "Prelude.Singletons"
+  , module Prelude.Singletons
   ) where
 
+import           Data.Functor.Const.Singletons (SConst(..))
+import           Data.Functor.Identity.Singletons (SIdentity(..))
+import           Data.Monoid.Singletons hiding (SFirst(..), SLast(..))
+import           Data.List.NonEmpty.Singletons (SNonEmpty(..))
 import           Data.Nat
+import           Data.Semigroup.Singletons hiding (SFirst(..), SLast(..))
 import           Data.Singletons.GADT
 import           Data.Singletons.GADT.Internal
 import           Data.Singletons.GADT.TH
-import           Data.Singletons.Prelude hiding ( SingKind(..), DemoteSym0, DemoteSym1
-                                                , FromSing, demote, singThat, withSomeSing )
-import           Data.Singletons.Prelude.Const (SConst(..))
-import           Data.Singletons.Prelude.Identity (SIdentity(..))
-import           Data.Singletons.Prelude.List.NonEmpty (SNonEmpty(..))
-import           Data.Singletons.Prelude.Monoid hiding (SFirst(..), SLast(..))
-import           Data.Singletons.Prelude.Semigroup hiding (SFirst(..), SLast(..))
-import           Data.Singletons.TypeLits (SNat(..), SSymbol(..))
 import qualified Data.Text as T
 import           Data.Text (Text)
 
 import           GHC.TypeLits (SomeSymbol(..), someSymbolVal, symbolVal)
+import           GHC.TypeLits.Singletons (SNat(..), SSymbol(..))
 import qualified GHC.TypeNats as TN
 import           GHC.TypeNats (SomeNat(..))
 
 import           Numeric.Natural (Natural)
+
+import           Prelude.Singletons hiding ( SingKind(..), DemoteSym0, DemoteSym1
+                                           , FromSing, demote, singThat, withSomeSing )
 
 $(singKindInstances1 existingSingInstNames)
 $(singKindInstances2 existingSingInstNames)

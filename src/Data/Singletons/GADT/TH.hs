@@ -211,7 +211,7 @@ singDec _ = pure ([], [])
 --
 -- This is largely cargo-culted from singDataD in the singletons library.
 singDataD :: forall q. OptionsMonad q
-          => Name -> [DTyVarBndr] -> [DCon]
+          => Name -> [DTyVarBndrUnit] -> [DCon]
           -> q ([DDec], [DDec])
 singDataD name tvbs ctors = do
   let tvbNames = map extractTvbName tvbs
@@ -358,15 +358,15 @@ extractNameTypes (DCon _ _ n fields _) = (n, tysOfConFields fields)
 
 -- Construct a data type's variable binders, possibly using fresh variables
 -- from the data type's kind signature.
-buildDataDTvbs :: DsMonad q => [DTyVarBndr] -> Maybe DKind -> q [DTyVarBndr]
+buildDataDTvbs :: DsMonad q => [DTyVarBndrUnit] -> Maybe DKind -> q [DTyVarBndrUnit]
 buildDataDTvbs tvbs mk = do
   extra_tvbs <- mkExtraDKindBinders $ fromMaybe (DConT typeKindName) mk
   pure $ tvbs ++ extra_tvbs
 
 -- extract the name from a TyVarBndr.
-extractTvbName :: DTyVarBndr -> Name
-extractTvbName (DPlainTV n) = n
-extractTvbName (DKindedTV n _) = n
+extractTvbName :: DTyVarBndr flag -> Name
+extractTvbName (DPlainTV n _)    = n
+extractTvbName (DKindedTV n _ _) = n
 
 -- apply an expression to a list of expressions
 foldExp :: DExp -> [DExp] -> DExp
