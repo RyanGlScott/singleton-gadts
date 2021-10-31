@@ -58,10 +58,10 @@ import           Prelude.Singletons hiding ( SingKind(..), DemoteSym0, DemoteSym
 $(singKindInstances1 existingSingInstNames)
 $(singKindInstances2 existingSingInstNames)
 
-type instance Demote TN.Nat = Natural
-type instance Promote Natural = TN.Nat
-type instance SingKindC (n :: TN.Nat) = ()
-instance SingKind TN.Nat where
+type instance Demote Natural = Natural
+type instance Promote Natural = Natural
+type instance SingKindC (n :: Natural) = ()
+instance SingKind Natural where
   fromSing (SNat :: Sing n) = TN.natVal (Proxy :: Proxy n)
   toSing n = case TN.someNatVal n of
                SomeNat (_ :: Proxy n) -> SomeSing (SNat :: Sing n)

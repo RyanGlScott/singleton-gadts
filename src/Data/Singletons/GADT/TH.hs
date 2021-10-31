@@ -280,7 +280,7 @@ singDataD name tvbs ctors = do
       opts <- getOptions
       let (cname, numArgs) = extractNameArgs c
       varNames <- replicateM numArgs (qNewName "b")
-      return $ DClause [DConP (singledDataConName opts cname) (map DVarP varNames)]
+      return $ DClause [DConP (singledDataConName opts cname) [] (map DVarP varNames)]
                        (foldExp
                           (DConE cname)
                           (map (DAppE (DVarE 'fromSing) . DVarE) varNames))
@@ -296,9 +296,9 @@ singDataD name tvbs ctors = do
           varPats        = zipWith mkToSingVarPat varNames promoted
           recursiveCalls = zipWith mkRecursiveCall varNames promoted
       return $
-        DClause [DConP cname varPats]
+        DClause [DConP cname [] varPats]
                 (multiCase recursiveCalls
-                           (map (DConP 'SomeSing . pure . DVarP)
+                           (map (DConP 'SomeSing [] . pure . DVarP)
                                 svarNames)
                            (DAppE (DConE 'SomeSing)
                                      (foldExp (DConE (singledDataConName opts cname))

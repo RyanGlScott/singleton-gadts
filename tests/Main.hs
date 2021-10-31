@@ -20,25 +20,31 @@ main :: IO ()
 main = pure ()
 
 $(singletons1 [d|
-  data Foo :: Type -> Type where
+  type Foo :: Type -> Type
+  data Foo a where
     MkFoo :: Foo Bool
 
-  data Quux :: Type -> Type where
+  type Quux :: Type -> Type
+  data Quux a where
     MkQuux1 :: Quux Bool
     MkQuux2 :: Quux Ordering
 
-  data Fin :: Nat -> Type where
+  type Fin :: Nat -> Type
+  data Fin n where
     FZ :: Fin (S n)
     FS :: Fin n -> Fin (S n)
 
-  data Vec :: Nat -> Type -> Type where
+  type Vec :: Nat -> Type -> Type
+  data Vec n a where
     VNil  :: Vec Z a
     VCons :: a -> Vec n a -> Vec (S n) a
 
-  data Prox :: forall k. k -> Type where
+  type Prox :: k -> Type
+  data Prox a where
     P :: forall k (a :: k). Prox a
 
-  data HList :: [Type] -> Type where
+  type HList :: [Type] -> Type
+  data HList l where
     HNil  :: HList '[]
     HCons :: x -> HList xs -> HList (x:xs)
   |])

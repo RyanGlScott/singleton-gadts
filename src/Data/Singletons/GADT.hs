@@ -74,7 +74,6 @@ import Unsafe.Coerce
 -- Rarely, the type and kind do not match. For example:
 --
 -- * @'Promote' (a -> b) = 'Promote' a '~>' 'Promote' b@
--- * @'Promote' Natural = Nat@
 -- * @'Promote' Text = Symbol@
 type Promote :: Type -> Type
 type family Promote k
