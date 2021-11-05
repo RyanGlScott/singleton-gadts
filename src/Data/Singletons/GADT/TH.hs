@@ -1,5 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 {-|
 Module:      Data.Singletons.GADT.Prelude
 Copyright:   (C) 2018 Ryan Scott

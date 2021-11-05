@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 {-|
 Module:      Data.Singletons.GADT.Internal
 Copyright:   (C) 2018 Ryan Scott
