@@ -47,7 +47,7 @@ library
                      , th-desugar       >= 1.13  && < 1.14
   hs-source-dirs:      src
   default-language:    GHC2021
-  ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors
+  ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors -fenable-th-splice-warnings
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -57,4 +57,4 @@ test-suite test
                      , singleton-nats >= 0.4.2 && < 0.5
   hs-source-dirs:      tests
   default-language:    GHC2021
-  ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors -threaded -rtsopts
+  ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors -fenable-th-splice-warnings -threaded -rtsopts
