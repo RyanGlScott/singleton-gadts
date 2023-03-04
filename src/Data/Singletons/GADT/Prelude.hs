@@ -40,11 +40,9 @@ import           Data.Singletons.GADT.TH
 import qualified Data.Text as T
 import           Data.Text (Text)
 
-import           GHC.TypeLits ( SomeChar(..), SomeSymbol(..)
-                              , charVal, someCharVal, someSymbolVal, symbolVal )
-import           GHC.TypeLits.Singletons (SChar(..), SNat(..), SSymbol(..))
+import           GHC.TypeLits ( fromSChar, fromSSymbol
+                              , withSomeSChar, withSomeSSymbol )
 import qualified GHC.TypeNats as TN
-import           GHC.TypeNats (SomeNat(..))
 
 import           Numeric.Natural (Natural)
 
@@ -58,25 +56,22 @@ type instance Demote Char = Char
 type instance Promote Char = Char
 type instance SingKindC (c :: Char) = ()
 instance SingKind Char where
-  fromSing (SChar :: Sing c) = charVal (Proxy :: Proxy c)
-  toSing c = case someCharVal c of
-               SomeChar (_ :: Proxy c) -> SomeSing (SChar :: Sing c)
+  fromSing = fromSChar
+  toSing c = withSomeSChar c SomeSing
 
 type instance Demote Natural = Natural
 type instance Promote Natural = Natural
 type instance SingKindC (n :: Natural) = ()
 instance SingKind Natural where
-  fromSing (SNat :: Sing n) = TN.natVal (Proxy :: Proxy n)
-  toSing n = case TN.someNatVal n of
-               SomeNat (_ :: Proxy n) -> SomeSing (SNat :: Sing n)
+  fromSing = TN.fromSNat
+  toSing n = TN.withSomeSNat n SomeSing
 
 type instance Demote Symbol = Text
 type instance Promote Text = Symbol
 type instance SingKindC (s :: Symbol) = ()
 instance SingKind Symbol where
-  fromSing (SSym :: Sing n) = T.pack (symbolVal (Proxy :: Proxy n))
-  toSing s = case someSymbolVal (T.unpack s) of
-               SomeSymbol (_ :: Proxy n) -> SomeSing (SSym :: Sing n)
+  fromSing = T.pack . fromSSymbol
+  toSing s = withSomeSSymbol (T.unpack s) SomeSing
 
 -- Time to show off
 $(genSingletons1     newSingInstNames)
