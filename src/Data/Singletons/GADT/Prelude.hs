@@ -40,8 +40,9 @@ import           Data.Singletons.GADT.TH
 import qualified Data.Text as T
 import           Data.Text (Text)
 
-import           GHC.TypeLits (SomeSymbol(..), someSymbolVal, symbolVal)
-import           GHC.TypeLits.Singletons (SNat(..), SSymbol(..))
+import           GHC.TypeLits ( SomeChar(..), SomeSymbol(..)
+                              , charVal, someCharVal, someSymbolVal, symbolVal )
+import           GHC.TypeLits.Singletons (SChar(..), SNat(..), SSymbol(..))
 import qualified GHC.TypeNats as TN
 import           GHC.TypeNats (SomeNat(..))
 
@@ -52,6 +53,14 @@ import           Prelude.Singletons hiding ( SingKind(..), DemoteSym0, DemoteSym
 
 $(singKindInstances1 existingSingInstNames)
 $(singKindInstances2 existingSingInstNames)
+
+type instance Demote Char = Char
+type instance Promote Char = Char
+type instance SingKindC (c :: Char) = ()
+instance SingKind Char where
+  fromSing (SChar :: Sing c) = charVal (Proxy :: Proxy c)
+  toSing c = case someCharVal c of
+               SomeChar (_ :: Proxy c) -> SomeSing (SChar :: Sing c)
 
 type instance Demote Natural = Natural
 type instance Promote Natural = Natural
