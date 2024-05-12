@@ -28,7 +28,7 @@ category:            Dependent Types
 build-type:          Simple
 extra-source-files:  CHANGELOG.md, README.md
 cabal-version:       >=1.10
-tested-with:         GHC == 9.8.1
+tested-with:         GHC == 9.10.1
 
 source-repository head
   type:                git
@@ -39,12 +39,12 @@ library
                        Data.Singletons.GADT.Prelude
                        Data.Singletons.GADT.TH
   other-modules:       Data.Singletons.GADT.Internal
-  build-depends:       base             >= 4.19  && < 4.20
-                     , singletons-base  >= 3.3   && < 3.4
+  build-depends:       base             >= 4.20  && < 4.21
+                     , singletons-base  >= 3.4   && < 3.5
                      , singleton-nats   >= 0.4.2 && < 0.5
-                     , template-haskell >= 2.21  && < 2.22
+                     , template-haskell >= 2.22  && < 2.23
                      , text             >= 2.0.1 && < 2.2
-                     , th-desugar       >= 1.16  && < 1.17
+                     , th-desugar       >= 1.17  && < 1.18
   hs-source-dirs:      src
   default-language:    GHC2021
   ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors -fenable-th-splice-warnings
@@ -52,7 +52,7 @@ library
 test-suite test
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  build-depends:       base           >= 4.19  && < 4.20
+  build-depends:       base           >= 4.20  && < 4.21
                      , singleton-gadts
                      , singleton-nats >= 0.4.2 && < 0.5
   hs-source-dirs:      tests
