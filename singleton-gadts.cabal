@@ -44,7 +44,7 @@ library
                      , singleton-nats   >= 0.4.2 && < 0.5
                      , template-haskell >= 2.22  && < 2.23
                      , text             >= 2.0.1 && < 2.2
-                     , th-desugar       >= 1.17  && < 1.18
+                     , th-desugar       >= 1.18  && < 1.19
   hs-source-dirs:      src
   default-language:    GHC2021
   ghc-options:         -Wall -Wcompat -Wno-unticked-promoted-constructors -fenable-th-splice-warnings
