@@ -320,13 +320,13 @@ singDataD name tvbs ctors = do
     mkEmptyFromSingClause = do
       x <- qNewName "x"
       pure $ DClause [DVarP x]
-           $ DCaseE (DVarE x) []
+           $ dCaseE (DVarE x) []
 
     mkEmptyToSingClause :: q DClause
     mkEmptyToSingClause = do
       x <- qNewName "x"
       pure $ DClause [DVarP x]
-           $ DConE 'SomeSing `DAppE` DCaseE (DVarE x) []
+           $ DConE 'SomeSing `DAppE` dCaseE (DVarE x) []
 
 -- | Make a constraint tuple 'DType' from a list of 'DType's. Avoids using a 1-tuple.
 mkTupleDType :: [DType] -> DType
@@ -340,8 +340,7 @@ mkTupleDType tys  = foldl DAppT (DConT $ tupleTypeName (length tys)) tys
 -- build a pattern match over several expressions, each with only one pattern
 multiCase :: [DExp] -> [DPat] -> DExp -> DExp
 multiCase [] [] body = body
-multiCase scruts pats body =
-  DCaseE (mkTupleDExp scruts) [DMatch (mkTupleDPat pats) body]
+multiCase scruts pats body = dCasesE scruts [DClause pats body]
 
 tysOfConFields :: DConFields -> [DType]
 tysOfConFields (DNormalC _ stys) = map snd stys
