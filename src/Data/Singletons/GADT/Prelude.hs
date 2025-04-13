@@ -50,8 +50,7 @@ import           Numeric.Natural (Natural)
 import           Prelude.Singletons hiding ( SingKind(..), DemoteSym0, DemoteSym1
                                            , FromSing, demote, singThat, withSomeSing )
 
-$(singKindInstances1 existingSingInstNames)
-$(singKindInstances2 existingSingInstNames)
+$(singKindInstances existingSingInstNames)
 
 type instance Demote Char = Char
 type instance Promote Char = Char
@@ -75,5 +74,4 @@ instance SingKind Symbol where
   toSing s = withSomeSSymbol (T.unpack s) SomeSing
 
 -- Time to show off
-$(genSingletons1     newSingInstNames)
-$(singKindInstances2 newSingInstNames)
+$(genSingletons newSingInstNames)

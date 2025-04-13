@@ -3,7 +3,6 @@
 {-# LANGUAGE TypeAbstractions #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import Data.Kind
@@ -14,7 +13,7 @@ import Data.Singletons.GADT.TH
 main :: IO ()
 main = pure ()
 
-$(singletons1 [d|
+$(singletons [d|
   type Foo :: Type -> Type
   data Foo a where
     MkFoo :: Foo Bool
@@ -43,4 +42,3 @@ $(singletons1 [d|
     HNil  :: HList '[]
     HCons :: x -> HList xs -> HList (x:xs)
   |])
-$(singKindInstances2 [''Foo, ''Quux, ''Fin, ''Vec, ''Prox, ''HList])

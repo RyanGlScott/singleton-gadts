@@ -23,7 +23,6 @@ module Data.Singletons.GADT (
   , Demote, DemoteX
   , PromoteDemoteInverse
   , SingKindC, SingKindX, SingKind(..)
-    -- $working_around_staging
 
     -- * Useful combinators
   , withSomeSing
@@ -146,54 +145,6 @@ class PromoteDemoteInverse k => SingKind k where
   fromSing :: Sing (a :: k) -> Demote k
   -- | Convert an unrefined type to an existentially-quantified singleton type.
   toSing :: Demote k -> SomeSing k
-
-{- $work_around_staging
-Due to GHC Trac #12088, a naïve attempt at defining 'Demote'/'Promote' and
-'DemoteX'/'PromoteX' instances all in one go will not succeed. For instance,
-the following will fail to typecheck:
-
-@
-type instance 'Demote'  [a] = ['Demote'  a]
-type instance 'Promote' [a] = ['Promote' a]
-
-type instance 'DemoteX' \'[]   = \'[]
-type instance 'DemoteX' (x:xs) = 'DemoteX' x : 'DemoteX' xs
-
-type instance 'PromoteX' \'[]   = \'[]
-type instance 'PromoteX' (x:xs) = 'PromoteX' x : 'PromoteX' xs
-@
-
-The errors will probably look something to the effect of:
-
-@
-    • Expected kind ‘Demote [k0]’,
-        but ‘DemoteX x : DemoteX xs’ has kind ‘[Demote k0]’
-    • In the type ‘DemoteX x : DemoteX xs’
-      In the type instance declaration for ‘DemoteX’
-@
-
-Because of Trac #12088, the @'Demote' [k0]@ in the kind of the
-@'DemoteX' (x:xs)@ instance does not reduce properly. Don't despair, though:
-one can work around this issue by explicitly separating the two groups of
-declarations using a Template Haskell splice:
-
-@
-&#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
-
-type instance 'Demote'  [a] = ['Demote'  a]
-type instance 'Promote' [a] = ['Promote' a]
-
-$(return [])
-
-type instance 'DemoteX' \'[]   = \'[]
-type instance 'DemoteX' (x:xs) = 'DemoteX' x : 'DemoteX' xs
-
-type instance 'PromoteX' \'[]   = \'[]
-type instance 'PromoteX' (x:xs) = 'PromoteX' x : 'PromoteX' xs
-@
-
-It's ugly, but it works.
--}
 
 -----
 -- Useful combinators
