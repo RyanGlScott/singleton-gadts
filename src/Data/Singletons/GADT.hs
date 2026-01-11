@@ -29,7 +29,7 @@ module Data.Singletons.GADT (
   , withSomeSing
   , singThat
   , demote
-  , pattern FromSing
+  , data FromSing
 
     -- * Defunctionalization symbols
   , DemoteSym0, DemoteSym1

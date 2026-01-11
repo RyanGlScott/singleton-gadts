@@ -328,11 +328,6 @@ singDataD name tvbs ctors = do
       pure $ DClause [DVarP x]
            $ DConE 'SomeSing `DAppE` dCaseE (DVarE x) []
 
--- | Make a constraint tuple 'DType' from a list of 'DType's. Avoids using a 1-tuple.
-mkTupleDType :: [DType] -> DType
-mkTupleDType [ty] = ty
-mkTupleDType tys  = foldl DAppT (DConT $ tupleTypeName (length tys)) tys
-
 ----------------------------------------
 -- Taken from singletons' source code --
 ----------------------------------------
